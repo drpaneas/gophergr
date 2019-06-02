@@ -1,0 +1,42 @@
+<div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+        <img src="{{ "/favicon.png" | absURL }}"
+             alt="Gopher.gr Logo" title="{{ .Site.Author.name }} Logo">
+      <h1>{{ .Site.Author.name }}</h1>
+      {{ with .Site.Params.tagline }}<p class="lead">{{ . | markdownify }}</p>{{ end }}
+    </div>
+
+    <ul class="sidebar-nav">
+      <li class="sidebar-nav-item"><a href="{{ "/" | absURL }}">{{ if isset .Site.Params "home"}}{{ .Site.Params.home }}{{ else }}Blog{{ end }}</a></li>
+      {{ range .Site.Menus.main }}
+      <li class="sidebar-nav-item">{{ .Pre }}<a href="{{ .URL | absURL }}">{{ .Name }}</a></li>
+      {{end}}
+    </ul>
+
+    <ul class="sidebar-nav">
+      <li class="sidebar-nav-item">
+      {{ with .Site.Params.github }}<a href="{{ . }}"><i class="fa fa-github-square fa-3x"></i></a>{{ end }}
+      {{ if .Site.Params.rss }}<a href="{{ "/index.xml" | absURL }}" type="application/rss+xml"><i class="fa fa-rss-square fa-3x"></i></a>{{ end }}
+      </li>
+    </ul>
+
+    {{ if isset .Site.Params "flattr" }}
+    <p><script id='flattr'>
+      (function(id){
+        var s = document.getElementById(id);
+        var f = document.createElement('iframe');
+        f.src = '//api.flattr.com/button/view/?uid={{ .Site.Params.flattr }}&button=compact&url={{ "/" | absURL }}&title={{ .Site.Title }}';
+        f.title = 'Flattr';
+        f.height = 20;
+        f.width = 110;
+        f.style.borderWidth = 0;
+        s.parentNode.insertBefore(f, s);
+      })('flattr');
+    </script></p>
+    {{ end }}
+
+    <p>Copyright &copy; {{ .Now.Format "2006" }} <a href="{{ "https://creativecommons.org/licenses/by-sa/3.0/gr/" }}">Άδεια</a><br/>
+       Φτιαγμένο με <a href="http://gohugo.io">Hugo</a> και <a href="https://github.com/zyro/hyde-x">Hyde-X</a></p>
+  </div>
+</div>
