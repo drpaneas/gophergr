@@ -1,7 +1,7 @@
 baseurl = "https://gopher.gr"
 title = "Golang στα ελληνικά"
 languageCode = "el"
-disqusShortname = "gophergr"
+# disqusShortname = "gophergr"
 MetaDataFormat = "toml"
 theme = "hyde-x"
 paginate = 10
