@@ -16,10 +16,8 @@
       {{ .Content }}
       {{ else if .Description }}
       <p>{{ .Description }}</p>
-      <a href="{{ .Permalink }}">Read On &rarr;</a>
       {{ else }}
       {{ .Summary }}
-      {{ if .Truncated }}<a href="{{ .Permalink }}">Read On &rarr;</a>{{ end }}
       {{ end }}
     </div>
     {{ end }}
