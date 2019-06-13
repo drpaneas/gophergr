@@ -1,7 +1,7 @@
 baseurl = "https://gopher.gr"
 title = "Golang στα ελληνικά"
 languageCode = "el"
-# disqusShortname = "gophergr"
+disqusShortname = "https-gopher-gr"
 MetaDataFormat = "toml"
 theme = "hyde-x"
 paginate = 10
@@ -12,7 +12,7 @@ paginate = 10
 [permalinks]
     # Optional. Change the permalink format for the 'post' content type.
     # The format shown here is the same one Jekyll/Octopress uses by default.
-    post = "/blog/:year/:month/:day/:title/"
+    post = "/:slug/"
 
 [taxonomies]
     # Optional. Use if you want tags and lists.
