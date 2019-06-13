@@ -2,7 +2,8 @@
 categories = ["functions"]
 date = "2017-05-08T22:08:35+02:00"
 tags = ["functions", "fmt", "printf", "sprintf", "println"]
-title = "Διαμορφώνοντας το output με Println, Printf και Sprintf"
+slug = "diamorfonontas-to-aoutput-me-Println-Printf-Sprintf"
+title = "diamorfonontas-to-aoutput-me-Println-Printf-Sprintf"
 
 +++
 
