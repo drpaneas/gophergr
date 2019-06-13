@@ -9,10 +9,10 @@ min_version = 0.14
 
 [author]
     name = "Andrei Mihu"
-    homepage = "http://andreimihu.com"
+    homepage = "https://andreimihu.com"
 
 # If Porting existing theme
 [original]
     author =  "poole"
-    homepage = "http://hyde.getpoole.com"
+    homepage = "https://hyde.getpoole.com"
     repo = "https://github.com/poole/hyde"
