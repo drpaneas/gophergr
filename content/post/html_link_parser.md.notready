@@ -1,0 +1,115 @@
++++
+
+categories = ["libraries"]
+date = "2019-07-07"
+tags = ["html", "parser", "sprintf", "println"]
+slug = "diamorfonontas-to-output-me-Println-Printf-Sprintf"
+title = "Διαμορφώνοντας το output με Println, Printf και Sprintf"
+
++++
+
+Θα δοκιμάσουμε να φτιάξουμε έναν _html link parser_. Αυτό σημαίνει ότι
+θα φτιάξουμε ένα δικό μας πακέτο το οποίο θα δέχεται τον κώδικα
+από μία σελίδα HTML και στην συνέχεια θα κάνει κάτι με αυτόν. Αν και υπάρχουν
+ήδη έτοιμες βιβλιοθήκες για web scraping/crawling, όπως η
+[Colly](http://go-colly.org/) εμείς θα προσπαθήσουμε να φτιάξουμε κάτι
+_from scratch_ χρησιμοποιώντας τον `io.Reader` για καθαρά εκπαιδευτικό σκοπό.
+Το να φτιάξει κανείς έναν HTML parser είναι πολύ χρήσιμο καθώς όλο κάπου θα
+σας χρειαστεί αργότερα, σε κάποιο άλλο πρόγραμμα. Η λειτουργία του parser μας
+είναι να δέχεται HTML κώδικα και να εξάγει όλα τα links μέσα από αυτόν. Όπου όταν λέμε
+link εννούμε προφανώς `<a href="">αυτό_το_πεδίο</a>`. Ας δούμε ένα παράδειγμα:
+
+##### Είσοδος
+
+```html
+<a href="/kotopoulo">
+  <span>Κάποιο κείμενο μέσα στο span</span>
+  Κάποιο κείμενο έξω από το span
+  <b>Έντονα γράμματα</b>
+</a>
+```
+
+##### Έξοδος
+
+```go
+Link{
+  Href: "/kotopoulo",
+  Text: "Κάποιο κείμενο μέσα στο span Κάποιο κείμενο έξω από το span Έντονα γράμματα",
+}
+```
+
+Οπότε πέρα από το _link_ θέλουμε να εξάγουμε και όλα τα υπόλοιπα _elements_ που εμπεριέχονται
+στο _link_, όπως το `<span>` και το `<b>` κείμενο. Η ιδέα είναι να ξεφορτωθούμε την html και να πάρουμε το αυτούσιο το _link_ μαζί με την _περιγραφή_ του. Το πιο σημαντικό από τα δύο, είναι προφανώς η εξαγωγή του _link_. Η εξαγωγή της περιγραφής του link είναι δευτερεύουσας
+σημασίας, ωστόσο μπορεί να χρησιμοποιθεί αργότερα σε κάποιο άλλο project σας ως μηχανή
+αναζήτης ή κάτι παρόμοιο.
+
+### Βοηθήματα
+
+#### Χρήση του x/net/html package
+
+Για την υλοποίηση αυτής της άσκηση προτείνουμε τη χρήση του [x/net/html](https://godoc.org/golang.org/x/net/html) πακέτου. Το πακέτο αυτό υποστηρίζεται από την ομάδα ανάπτυξης της
+Go, και αυτό φαίνεται εξάλλου και από το link, το οποίο περιέχει το domain `golang.org`.
+Είναι σημαντικό εδώ να σημειώσουμε ότι η παρόμοια πακέτα που προέρχονται από το `golang.org`
+δεν είναι κομμάτι της _standard library_, συνεπώς ανα πάσα στιγμή μπορεί να μην λειτουργούν
+σωστά με τις καινούριες εκδόσεις της Go ή να μην υπάρχει _backwards compatibility_. θα λέγαμε
+πως τα πακέτα αυτά είναι σε πρώιμο στάδιο δοκιμής, και όταν ωριμάσουν γίνονται τότε κομμάτι
+της επίσημης Go.
+
+Το πρώτο πράγμα που θα δείτε στο documentation του πακέτου είναι
+
+>  Package html implements an HTML5-compliant tokenizer and parser.
+> Tokenization is done by creating a Tokenizer for an io.Reader r. It is the caller's responsibility to ensure that r provides UTF-8 encoded HTML. 
+
+Μην κάνετε κάτι τέτοιο. Δεν μας ενδιαφέρει ο `tokenizer`. Συνεχίστε να κάνετε
+scroll-down μέχρι να φτάσετε στο παράδειγμα του _html parser_:
+
+>  Parsing is done by calling Parse with an io.Reader, which returns the root of the parse tree (the document element) as a *Node. It is the caller's responsibility to ensure that the Reader provides UTF-8 encoded HTML. For example, to process each anchor node in depth-first order: 
+
+```go
+doc, err := html.Parse(r)
+if err != nil {
+	// ...
+}
+var f func(*html.Node)
+f = func(n *html.Node) {
+	if n.Type == html.ElementNode && n.Data == "a" {
+		// Do something with n...
+	}
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		f(c)
+	}
+}
+f(doc)
+```
+
+Το αποτέλεσμα του parsing αυτού του κώδικα δουλεύει με `html.Nodes` τους οποίους θα
+χρησιμοποιήσουμε για να δούμε το _html document_ και να κάνουμε _parse_ τα στοιχεία
+που μας ενδιαφέρουν.
+
+##### Όχι nested links
+
+Στην περίπτωση που υπάρχουν εμφωλευμένα links, τότε μην τα λάβετε υπόψη σας. Για παράδειγμα:
+
+```html
+<a href="https://bankofgreece.gr">
+  Και καπου εδώ υπάρχει <a href="/freemoney">ενα nested link</a>
+</a>
+```
+
+Θεωρούμε ικανοποιητικό για τον parser να μας επιστρέφει μόνο το εξωτερικό link,
+χωρίς αυτό να αποτελεί πρόβλημα.
+
+##### Δεν χρειάζεται να είναι τέλειο
+
+Μην προσπαθήσετε να τελειοποιήσετε τον parser. Αντίθετα, φτιάξτε κάτι που δουλεύει
+αρκετά καλά, και μετά ξεκινήτε να φτιάχνετε τυχόν bugs.
+
+#### Διαβάστε για το πακέτα
+
+Το πακέτο που θα χρησιμοποιήσουμε για το parsing της HTML χρησιμοποιεί
+[Nodes](https://godoc.org/golang.org/x/net/html#NodeType). Φροντίστε να μάθετε
+λίγα πράγματα για αυτούς πριν ξεκινήσετε. Όταν το κάνετε θα ανακαλύψετε ότι το πακέτο χρησιμοποιεί _γράφους_ (graph theory), trees και _DFS_ (Depth-first search). Φροντίστε
+να μάθετε επίσης κάποια πράγματα για αυτά, καθώς θα σας βοηθήσει να κατανοήσετε καλύτερα
+το πώς δουλεύει το όλο σύστημα. Ακόμα κι αν δεν το κάνετε, θα είστε σε θέση να ολοκληρώσετε
+την άσκηση, ωστόσο μία ολοκληρωμένη εικόνα δεν σημαίνει ότι πρέπει να μάθετε τα πάντα γύρω
+από τους γραφους, αλλά μόνο σχετικά με τα _BDS_ και _DFS_.
